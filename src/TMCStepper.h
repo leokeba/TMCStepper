@@ -151,7 +151,7 @@ class TMCStepper {
 
 class TMC2130Stepper : public TMCStepper {
 	public:
-		TMC2130Stepper(uint16_t pinCS, float RS = default_RS, int8_t link_index = -1);
+		TMC2130Stepper(uint16_t pinCS, float RS = default_RS, int8_t link_index = -1, SPIClass* spi = &SPI);
 		TMC2130Stepper(uint16_t pinCS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link_index = -1);
 		TMC2130Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link_index = -1);
 		void begin();
@@ -370,6 +370,7 @@ class TMC2130Stepper : public TMCStepper {
 		static uint32_t spi_speed; // Default 2MHz
 		const uint16_t _pinCS;
 		SW_SPIClass * TMC_SW_SPI = nullptr;
+		SPIClass * _spi = &SPI;
 		static constexpr float default_RS = 0.11;
 
 		int8_t link_index;
@@ -378,7 +379,7 @@ class TMC2130Stepper : public TMCStepper {
 
 class TMC2160Stepper : public TMC2130Stepper {
 	public:
-		TMC2160Stepper(uint16_t pinCS, float RS = default_RS, int8_t link_index = -1);
+		TMC2160Stepper(uint16_t pinCS, float RS = default_RS, int8_t link_index = -1, SPIClass* spi = &SPI);
 		TMC2160Stepper(uint16_t pinCS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link_index = -1);
 		TMC2160Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link_index = -1);
 		void begin();
@@ -477,7 +478,7 @@ class TMC2160Stepper : public TMC2130Stepper {
 
 class TMC5130Stepper : public TMC2160Stepper {
 	public:
-		TMC5130Stepper(uint16_t pinCS, float RS = default_RS, int8_t link_index = -1);
+TMC5130Stepper(uint16_t pinCS, float RS = default_RS, int8_t link_index = -1, SPIClass* spi = &SPI);
 		TMC5130Stepper(uint16_t pinCS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link_index = -1);
 		TMC5130Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link_index = -1);
 
@@ -721,7 +722,7 @@ class TMC5130Stepper : public TMC2160Stepper {
 
 class TMC5160Stepper : public TMC5130Stepper {
 	public:
-		TMC5160Stepper(uint16_t pinCS, float RS = default_RS, int8_t link_index = -1);
+TMC5160Stepper(uint16_t pinCS, float RS = default_RS, int8_t link_index = -1, SPIClass* spi = &SPI);
 		TMC5160Stepper(uint16_t pinCS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link_index = -1);
 		TMC5160Stepper(uint16_t pinCS, float RS, uint16_t pinMOSI, uint16_t pinMISO, uint16_t pinSCK, int8_t link_index = -1);
 

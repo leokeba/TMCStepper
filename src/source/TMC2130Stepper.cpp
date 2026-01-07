@@ -4,10 +4,11 @@
 int8_t TMC2130Stepper::chain_length = 0;
 uint32_t TMC2130Stepper::spi_speed = 16000000/8;
 
-TMC2130Stepper::TMC2130Stepper(uint16_t pinCS, float RS, int8_t link) :
+TMC2130Stepper::TMC2130Stepper(uint16_t pinCS, float RS, int8_t link, SPIClass* spi) :
   TMCStepper(RS),
   _pinCS(pinCS),
-  link_index(link)
+  link_index(link),
+  _spi(spi)
   {
     defaults();
 
@@ -67,13 +68,13 @@ void TMC2130Stepper::switchCSpin(bool state) {
 __attribute__((weak))
 void TMC2130Stepper::beginTransaction() {
   if (TMC_SW_SPI == nullptr) {
-    SPI.beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE3));
+    _spi->beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE3));
   }
 }
 __attribute__((weak))
 void TMC2130Stepper::endTransaction() {
   if (TMC_SW_SPI == nullptr) {
-    SPI.endTransaction();
+    _spi->endTransaction();
   }
 }
 
@@ -84,7 +85,7 @@ uint8_t TMC2130Stepper::transfer(const uint8_t data) {
     out = TMC_SW_SPI->transfer(data);
   }
   else {
-    out = SPI.transfer(data);
+    out = _spi->transfer(data);
   }
   return out;
 }
