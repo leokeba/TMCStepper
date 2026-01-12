@@ -1,6 +1,25 @@
 #include "TMCStepper.h"
 #include "TMC_MACROS.h"
 
+#if defined(ARDUINO_ARCH_ESP32)
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+
+// Global mutex to serialize hardware SPI bus access against other peripherals (e.g. W5500)
+// when this library runs on ESP32. Software SPI does not share the hardware bus and is skipped.
+static SemaphoreHandle_t tmc_spi_mutex = nullptr;
+
+static inline SemaphoreHandle_t tmcGetSpiMutex()
+{
+  // Lazy init to avoid static init ordering issues
+  if (tmc_spi_mutex == nullptr)
+  {
+    tmc_spi_mutex = xSemaphoreCreateMutex();
+  }
+  return tmc_spi_mutex;
+}
+#endif
+
 int8_t TMC2130Stepper::chain_length = 0;
 uint32_t TMC2130Stepper::spi_speed = 16000000/8;
 
@@ -68,6 +87,13 @@ void TMC2130Stepper::switchCSpin(bool state) {
 __attribute__((weak))
 void TMC2130Stepper::beginTransaction() {
   if (TMC_SW_SPI == nullptr) {
+#if defined(ARDUINO_ARCH_ESP32)
+    SemaphoreHandle_t lock = tmcGetSpiMutex();
+    if (lock != nullptr)
+    {
+        xSemaphoreTake(lock, portMAX_DELAY);
+    }
+#endif
     _spi->beginTransaction(SPISettings(spi_speed, MSBFIRST, SPI_MODE3));
   }
 }
@@ -75,6 +101,13 @@ __attribute__((weak))
 void TMC2130Stepper::endTransaction() {
   if (TMC_SW_SPI == nullptr) {
     _spi->endTransaction();
+#if defined(ARDUINO_ARCH_ESP32)
+    SemaphoreHandle_t lock = tmcGetSpiMutex();
+    if (lock != nullptr)
+    {
+        xSemaphoreGive(lock);
+    }
+#endif
   }
 }
 
